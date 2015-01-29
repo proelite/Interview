@@ -215,9 +215,9 @@ public class TrinaryTree<K extends Comparable<K>> {
 	 */
 
 	public static void TestDeleteRoot() {
-		TrinaryTree<Integer> tree = new TrinaryTree<Integer>();
-		tree.insert(6);
-		assert (tree.toString().equals("6 "));
+		TrinaryTree<Integer> tree = new TrinaryTree<Integer>(new Integer[] {6});
+		tree.delete(6);
+		assert (tree.getRoot() == null);
 	}
 
 	/*
@@ -248,7 +248,12 @@ public class TrinaryTree<K extends Comparable<K>> {
 	}
 
 	public static void TestDeleteLeafNode() {
-
+		TrinaryTree<Integer> tree = new TrinaryTree<Integer>(new Integer[] { 1,
+				2, 3 });
+		tree.delete(3);
+		assert (tree.toString().equals("1 2 "));
+		assert (tree.getRoot().val == 2);
+		assert (tree.getRoot().right == null);
 	}
 
 	/*
