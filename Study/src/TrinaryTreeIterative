@@ -1,0 +1,357 @@
+public class TrinaryTree {
+
+	public static class TrinaryNode {
+		TrinaryNode left;
+		TrinaryNode mid;
+		TrinaryNode right;
+		int val;
+
+		public TrinaryNode(int v) {
+			val = v;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(val);
+		}
+	}
+
+	TrinaryNode mRoot;
+
+	public TrinaryTree() {
+	}
+	
+	public TrinaryTree(int[] values) 
+	{
+		insert(values, 0, values.length - 1);
+	}
+	
+	
+	public TrinaryTree(TrinaryNode root) {
+		mRoot = root;
+	}
+
+	public TrinaryNode getRoot()
+	{
+		return mRoot;
+	}
+	
+	private void insert(int[] values, int start, int end) 
+	{
+		if (start > end)
+		{
+			return;
+		}
+		
+		int mid = (start + end) / 2;
+		insert(values[mid]);
+		insert(values, start, mid - 1);
+		insert(values, mid + 1, end);
+	}
+	
+	public void insert(int val) {
+		if (mRoot == null) {
+			mRoot = new TrinaryNode(val);
+			return;
+		}
+
+		TrinaryNode tempNode = mRoot;
+
+		while (tempNode != null) {
+			if (val < tempNode.val) {
+				if (tempNode.left != null) {
+					tempNode = tempNode.left;
+				} else {
+					tempNode.left = new TrinaryNode(val);
+					return;
+				}
+			} else if (val == tempNode.val) {
+				if (tempNode.mid != null) {
+					tempNode = tempNode.mid;
+				} else {
+					tempNode.mid = new TrinaryNode(val);
+					return;
+				}
+			} else if (val > tempNode.val) {
+				if (tempNode.right != null) {
+					tempNode = tempNode.right;
+				} else {
+					tempNode.right = new TrinaryNode(val);
+					return;
+				}
+			}
+		}
+	}
+
+	public boolean delete(int val) 
+	{
+		if (mRoot == null) 
+		{
+			return false;
+		}
+		
+		TrinaryNode parent = null;
+		TrinaryNode tempNode = mRoot;
+		
+		while (tempNode != null)
+		{
+			if (tempNode.val == val) 
+			{
+				// if leaf node
+				if (tempNode.left == null && tempNode.right == null) 
+				{
+					// if not the root
+					if (parent != null) 
+					{
+						// if tempNode is left child
+						if (parent.left != null && parent.left.val == tempNode.val) 
+						{
+							parent.left= null;
+						}
+						else 
+						{
+							parent.right = null;
+						}
+					}
+					else 
+					{
+						mRoot = null;
+					}
+					
+					tempNode = null;
+					return true;
+				}	
+				
+				
+				// if left child node with left children
+				if (tempNode.right == null) 
+				{
+					TrinaryNode maxInLeftSubtree = findMax(tempNode.left);		
+					tempNode.val = maxInLeftSubtree.val;
+					
+					// if left child node has children
+					if (maxInLeftSubtree.left != null)
+					{
+						tempNode.left = maxInLeftSubtree.left;
+						tempNode.mid = maxInLeftSubtree.mid;
+					}
+					else
+					{
+						tempNode.left = null;
+					}
+					
+					maxInLeftSubtree = null;
+					
+					return true;
+				} 
+				else
+				{
+					TrinaryNode minInRightSubtree = findMin(tempNode.right);		
+					tempNode.val = minInRightSubtree.val;
+					
+					// if left child node has children
+					if (minInRightSubtree.right != null)
+					{
+						tempNode.right = minInRightSubtree.right;
+						tempNode.mid = minInRightSubtree.mid;
+					}
+					else
+					{
+						tempNode.right = null;
+					}
+					
+					minInRightSubtree = null;
+					
+					return true;
+				}
+			}
+			
+			if (val < tempNode.val) 
+			{
+				if (tempNode.left != null) 
+				{
+					parent = tempNode;
+					tempNode = tempNode.left;
+				}
+				else 
+				{
+					return false;
+				}
+			}
+			
+			if (val > tempNode.val) 
+			{
+				if (tempNode.right != null) 
+				{
+					parent = tempNode;
+					tempNode = tempNode.right;
+				}
+				else 
+				{
+					return false;
+				}
+			}
+		}
+				
+		return false;
+		
+	}
+
+	public TrinaryNode findMax(TrinaryNode node) {
+		TrinaryNode tempNode = node;
+
+		if (node == null) {
+			return null;
+		}
+
+		while (tempNode.right != null) {
+			tempNode = tempNode.right;
+		}
+
+		return tempNode;
+	}
+
+	public TrinaryNode findMin(TrinaryNode node) {
+		TrinaryNode tempNode = node;
+
+		if (node == null) {
+			return null;
+		}
+
+		while (tempNode.left != null) {
+			tempNode = tempNode.left;
+		}
+
+		return tempNode;
+	}
+	
+	public static void TestTrinaryTree()
+	{
+		TestConstruction();
+		TestInsert();
+		TestDeleteRoot();
+		TestDeleteRootWithChildren();
+		TestDeleteWithLeftSubtreeMaxLeaf();
+		TestDeleteWithLeftSubtreeMaxNonLeaf();
+		TestDeleteWithRightSubtreeMinLeaf();
+		TestDeleteWithRightSubtreeMinNonLeaf();
+	}
+	
+	public static void TestConstruction()
+	{
+		TrinaryTree tree = new TrinaryTree(new int[] {1, 2, 3, 4, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
+		assert(tree.toString().equals("1 2 3 4 5 6 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 "));
+	}
+	
+	public static void TestInsert()
+	{
+		TrinaryTree tree = new TrinaryTree(new int[] {1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
+		tree.insert(6);
+		assert(tree.toString().equals("1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 "));
+	}
+	
+	public static void TestInsertMid()
+	{
+		TrinaryTree tree = new TrinaryTree(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
+		tree.insert(7);
+		assert(tree.toString().equals("1 2 3 4 5 6 7 7 8 9 10 11 12 13 14 15 16 17 18 19 20 "));
+	}
+	
+	
+	public static void TestDeleteRoot()
+	{
+		TrinaryTree tree = new TrinaryTree();
+		tree.insert(6);
+		assert(tree.toString().equals("6 "));
+	}
+	
+	public static void TestDeleteRootWithChildren()
+	{
+		TrinaryTree tree = new TrinaryTree(new int[] {1, 2, 3});
+		tree.delete(2);
+		assert(tree.toString().equals("1 3 "));
+		assert(tree.getRoot().val == 3);
+		assert(tree.getRoot().left.val == 1);
+	}
+	
+	public static void TestDeleteWithLeftSubtreeMaxLeaf()
+	{
+		TrinaryTree tree = new TrinaryTree();
+		tree.insert(5);
+		tree.insert(7);
+		tree.insert(9);
+		tree.insert(6);
+		tree.insert(8);
+		tree.insert(10);
+		assert(tree.delete(7));
+		assert(tree.toString().equals("5 6 8 9 10 ")); 
+		assert(tree.getRoot().right.val == 8);
+		assert(tree.getRoot().right.left.val == 6);
+		assert(tree.getRoot().right.right.val == 9);
+	}
+	
+	public static void TestDeleteWithLeftSubtreeMaxNonLeaf()
+	{
+		TrinaryTree tree = new TrinaryTree();
+		tree.insert(5);
+		tree.insert(7);
+		tree.insert(8);
+		tree.insert(6);
+		tree.insert(9);
+		assert(tree.delete(7));
+		assert(tree.toString().equals("5 6 8 9 "));
+		assert(tree.getRoot().right.val == 8);
+		assert(tree.getRoot().right.left.val == 6);
+		assert(tree.getRoot().right.right.val == 9);
+	}
+	
+	public static void TestDeleteWithRightSubtreeMinLeaf()
+	{
+		TrinaryTree tree = new TrinaryTree();
+		tree.insert(5);
+		tree.insert(3);
+		tree.insert(4);
+		tree.insert(2);
+		tree.insert(1);
+		assert(tree.delete(4));
+		assert(tree.toString().equals("1 2 3 5 "));
+		assert(tree.getRoot().left.val == 3);
+		assert(tree.getRoot().left.right == null);
+		assert(tree.getRoot().left.left.val == 2);
+	}
+	
+	public static void TestDeleteWithRightSubtreeMinNonLeaf()
+	{
+		TrinaryTree tree = new TrinaryTree();
+		tree.insert(5);
+		tree.insert(3);
+		tree.insert(2);
+		tree.insert(1);
+		tree.insert(3);
+		tree.insert(2);
+		assert(tree.delete(3));
+		assert(tree.toString().equals("1 2 2 5 "));
+		assert(tree.getRoot().left.val == 2);
+		assert(tree.getRoot().left.left.val == 1);
+	}
+	
+	private void inOrderPrint(TrinaryNode node, StringBuilder builder)
+	{
+		if (node != null) 
+		{
+			inOrderPrint(node.left, builder);
+			builder.append(node.val).append(" ");
+			inOrderPrint(node.mid, builder);
+			inOrderPrint(node.right, builder);
+		}
+	}
+	
+	@Override 
+	public String toString()
+	{
+		
+		StringBuilder builder = new StringBuilder();
+		inOrderPrint(mRoot, builder);
+		return builder.toString();
+	}
+}
